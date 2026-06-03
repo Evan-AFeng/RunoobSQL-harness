@@ -1,0 +1,75 @@
+[project]
+name = "runoobsql-harness"
+version = "0.1.0"
+description = "A lightweight NL2SQL harness based on Flask, Vue 3, and SQLite."
+requires-python = ">=3.10"
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+select = [
+  "E",   # pycodestyle errors
+  "F",   # pyflakes
+  "I",   # import sorting
+  "B",   # flake8-bugbear
+  "UP",  # pyupgrade
+  "SIM", # flake8-simplify
+]
+ignore = []
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
+
+[tool.mypy]
+python_version = "3.10"
+warn_unused_configs = true
+ignore_missing_imports = true
+strict_optional = true
+check_untyped_defs = true
+
+[tool.pytest.ini_options]
+testpaths = ["backend/tests", "tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-q"
+
+[tool.coverage.run]
+branch = true
+source = ["backend/app"]
+omit = [
+  "*/tests/*",
+  "*/__pycache__/*",
+]
+
+[tool.coverage.report]
+fail_under = 60
+show_missing = true
+skip_covered = true
+
+[tool.runoobsql.lint]
+# Unified linter entry:
+#   python tools/run_linters.py
+#
+# Add project-specific linters here without changing the runner. Use "{python}"
+# when the command should run with the current Python interpreter.
+default_commands = [
+  ["{python}", "-m", "ruff", "check", "."],
+  ["{python}", "-m", "ruff", "format", "--check", "."],
+  ["{python}", "-m", "mypy", "backend"],
+]
+custom_commands = [
+  ["{python}", "tools/custom_linters/max_file_lines.py"],
+  ["{python}", "tools/custom_linters/no_print_in_backend.py"],
+  ["{python}", "tools/custom_linters/max_line_width.py"],
+]
+
+# Commands whose target paths do not exist yet are skipped. This keeps the
+# initial harness runnable before backend/ is scaffolded.
+skip_if_missing = [
+  "backend",
+]

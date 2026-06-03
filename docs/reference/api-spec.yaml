@@ -1,0 +1,105 @@
+---
+last_updated: 2026-06-03 15:33:51 +08:00
+status: active
+owner: @Evan-AFeng
+---
+
+openapi: 3.0.3
+info:
+  title: RunoobSQL Harness API
+  version: 0.1.0
+  description: Lightweight NL2SQL query service API.
+servers:
+  - url: http://localhost:5000
+paths:
+  /api/health:
+    get:
+      summary: Health check
+      responses:
+        "200":
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+  /api/query:
+    post:
+      summary: Convert a natural language question into SQL and return query results
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QueryRequest"
+      responses:
+        "200":
+          description: Query succeeded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QueryResponse"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          example: ok
+    QueryRequest:
+      type: object
+      required:
+        - question
+      properties:
+        question:
+          type: string
+          minLength: 1
+          example: 查询销售额最高的 10 个商品
+    QueryResponse:
+      type: object
+      required:
+        - sql
+        - columns
+        - rows
+      properties:
+        sql:
+          type: string
+          example: SELECT name, sales FROM products ORDER BY sales DESC LIMIT 10
+        columns:
+          type: array
+          items:
+            type: string
+        rows:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+    ErrorResponse:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          example: INVALID_REQUEST
+        message:
+          type: string
+          example: question is required
+        detail:
+          type: object
+          additionalProperties: true
