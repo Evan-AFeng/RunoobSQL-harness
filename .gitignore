@@ -1,0 +1,12 @@
+.coverage
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+__pycache__/
+
+backend/instance/
+instance/
+
+frontend/dist/
+frontend/node_modules/
+frontend/package-lock.json

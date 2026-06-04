@@ -28,6 +28,7 @@ EXCLUDED_DIRS = {
     ".ruff_cache",
     ".venv",
     "__pycache__",
+    "dist",
     "node_modules",
 }
 

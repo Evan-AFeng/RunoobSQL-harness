@@ -33,6 +33,7 @@ owner: @Evan-AFeng
 | `SQL_VALIDATE_FAILED` | 422 | SQL 校验失败 |
 | `SQL_EXECUTE_FAILED` | 500 | SQL 执行失败 |
 | `DATABASE_UNAVAILABLE` | 503 | 数据库不可用 |
+| `DATABASE_IMPORT_FAILED` | 422 | SQLite 数据库导入失败 |
 
 ## 使用约定
 
