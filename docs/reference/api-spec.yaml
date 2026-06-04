@@ -1,5 +1,5 @@
 ---
-last_updated: 2026-06-03 15:33:51 +08:00
+last_updated: 2026-06-03 18:00:00 +08:00
 status: active
 owner: @Evan-AFeng
 ---
@@ -50,6 +50,64 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+  /api/query/stream:
+    get:
+      summary: Stream NL2SQL generation progress and query results through SSE
+      parameters:
+        - in: query
+          name: database_id
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: question
+          required: true
+          schema:
+            type: string
+            minLength: 1
+      responses:
+        "200":
+          description: Server-sent event stream
+          content:
+            text/event-stream:
+              schema:
+                type: string
+                description: Emits model_delta, sql, result, error, and done events.
+  /api/databases/import:
+    post:
+      summary: Import a user-provided SQLite database file
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: SQLite database file with .db, .sqlite, or .sqlite3 extension.
+      responses:
+        "201":
+          description: Database imported
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DatabaseImportResponse"
+        "400":
+          description: Missing file or unsupported file extension
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "422":
+          description: Invalid SQLite database
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 components:
   schemas:
     HealthResponse:
@@ -63,12 +121,16 @@ components:
     QueryRequest:
       type: object
       required:
+        - database_id
         - question
       properties:
+        database_id:
+          type: string
+          example: sales-1a2b3c4d
         question:
           type: string
           minLength: 1
-          example: 查询销售额最高的 10 个商品
+          example: Show the top 10 products by sales.
     QueryResponse:
       type: object
       required:
@@ -88,6 +150,64 @@ components:
           items:
             type: object
             additionalProperties: true
+    DatabaseImportResponse:
+      type: object
+      required:
+        - database_id
+        - filename
+        - path
+        - tables
+      properties:
+        database_id:
+          type: string
+          example: sales-1a2b3c4d
+        filename:
+          type: string
+          example: sales.db
+        path:
+          type: string
+          example: instance/databases/sales-1a2b3c4d.db
+        tables:
+          type: array
+          items:
+            $ref: "#/components/schemas/ImportedTable"
+    ImportedTable:
+      type: object
+      required:
+        - name
+        - columns
+        - row_count
+      properties:
+        name:
+          type: string
+          example: products
+        columns:
+          type: array
+          items:
+            $ref: "#/components/schemas/ImportedColumn"
+        row_count:
+          type: integer
+          example: 42
+    ImportedColumn:
+      type: object
+      required:
+        - name
+        - type
+        - nullable
+        - primary_key
+      properties:
+        name:
+          type: string
+          example: id
+        type:
+          type: string
+          example: INTEGER
+        nullable:
+          type: boolean
+          example: false
+        primary_key:
+          type: boolean
+          example: true
     ErrorResponse:
       type: object
       required:

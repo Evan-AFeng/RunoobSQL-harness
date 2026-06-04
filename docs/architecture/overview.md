@@ -53,3 +53,4 @@ RunoobSQL-harness/
 - 业务逻辑放在 service 层，避免散落在 route 中。
 - SQLite 仅作为本地轻量存储，避免引入复杂部署依赖。
 - 前端 API 调用统一放在 `frontend/src/api/`，页面不直接拼接请求。
+- 前端、后端都需要启动入口。
